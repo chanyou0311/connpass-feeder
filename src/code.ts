@@ -1,0 +1,1 @@
+function notifySlack(message: string) {}
