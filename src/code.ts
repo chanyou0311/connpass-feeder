@@ -177,11 +177,7 @@ function updateSpreadsheet(events: Array<event>) {
   });
 }
 
-function getDiffEvents() {}
-
 function main() {
   const events = getConnpassEvents("https://connpass.com/api/v1/event/");
-  console.log(events);
   updateSpreadsheet(events);
-  // notifySlack("やっぽ！");
 }
