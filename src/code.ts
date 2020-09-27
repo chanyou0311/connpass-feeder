@@ -76,30 +76,30 @@ function notifySlack(message: string, event: event) {
       {
         title: "イベント開催日時",
         value: `開始: ${event.started_at}\n終了: ${event.ended_at}`,
-        short: false
+        short: false,
       },
       {
         title: "場所",
         value: `${event.address}\n${event.place}`,
-        short: false
-      }
+        short: false,
+      },
     ],
     image_url: "http://my-website.com/path/to/image.jpg",
     thumb_url: "http://example.com/path/to/thumb.png",
     footer: "ふもちゃん",
     footer_icon:
       "https://avatars.slack-edge.com/2019-08-16/729497104224_c495afa8a121b77eb718_512.jpg",
-    ts: Math.round(Date.parse(event.updated_at) / 1000)
+    ts: Math.round(Date.parse(event.updated_at) / 1000),
   };
   const payloadData: payloadInterface = {
     text: message,
-    attachments: [attachment]
+    attachments: [attachment],
   };
 
   const options: GoogleAppsScript.URL_Fetch.URLFetchRequestOptions = {
     method: "post",
     contentType: "application/json",
-    payload: JSON.stringify(payloadData)
+    payload: JSON.stringify(payloadData),
   };
   UrlFetchApp.fetch(slackWebhookUrl, options);
 }
@@ -130,7 +130,7 @@ function getEventIds(sheet: GoogleAppsScript.Spreadsheet.Sheet): Array<number> {
     1,
     sheet.getLastRow() - 1
   );
-  const flatten = array => {
+  const flatten = (array) => {
     return array.reduce((a, c) => {
       return Array.isArray(c) ? a.concat(flatten(c)) : a.concat(c);
     }, []);
@@ -149,7 +149,7 @@ function updateSpreadsheet(events: Array<event>) {
   const event_ids: Array<number> = getEventIds(sheet);
 
   let header: string;
-  events.map(event => {
+  events.map((event) => {
     if (event_ids.indexOf(event.event_id) === -1) {
       const row: number = sheet.getDataRange().getLastRow() + 1;
       for (header of Object.keys(event)) {
