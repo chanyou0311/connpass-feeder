@@ -45,10 +45,6 @@ interface attachment {
   title_link: string;
   text: string;
   fields: Array<attachmentField>;
-  image_url: string;
-  thumb_url: string;
-  footer: string;
-  footer_icon: string;
   ts: number;
 }
 
@@ -57,11 +53,24 @@ interface payloadInterface {
   attachments: Array<attachment>;
 }
 
-const slackWebhookUrl: string = PropertiesService.getScriptProperties().getProperty(
-  "slackWebhookUrl"
-);
+function getKeyword(): string {
+  const spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = spreadsheet.getSheetByName("config");
+  const range: GoogleAppsScript.Spreadsheet.Range = sheet.getDataRange();
+  const values = range.getValues();
+  return values.find((row) => row[0] === "keyword")[1];
+}
+
+function getSlackWebhookUrl(): string {
+  const spreadsheet: GoogleAppsScript.Spreadsheet.Spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = spreadsheet.getSheetByName("config");
+  const range: GoogleAppsScript.Spreadsheet.Range = sheet.getDataRange();
+  const values = range.getValues();
+  return values.find((row) => row[0] === "slackWebhookUrl")[1];
+}
 
 function notifySlack(message: string, event: event) {
+  const slackWebhookUrl = getSlackWebhookUrl();
   const attachment: attachment = {
     fallback: "Required plain-text summary of the attachment.",
     color: "#D33017",
@@ -84,11 +93,6 @@ function notifySlack(message: string, event: event) {
         short: false,
       },
     ],
-    image_url: "http://my-website.com/path/to/image.jpg",
-    thumb_url: "http://example.com/path/to/thumb.png",
-    footer: "ふもちゃん",
-    footer_icon:
-      "https://avatars.slack-edge.com/2019-08-16/729497104224_c495afa8a121b77eb718_512.jpg",
     ts: Math.round(Date.parse(event.updated_at) / 1000),
   };
   const payloadData: payloadInterface = {
@@ -105,8 +109,9 @@ function notifySlack(message: string, event: event) {
 }
 
 function getConnpassEvents(url: string): Array<event> {
+  const keyword = getKeyword();
   const response: GoogleAppsScript.URL_Fetch.HTTPResponse = UrlFetchApp.fetch(
-    url + "?keyword=広島&count=100"
+    url + `?keyword=${keyword}&count=100`
   );
   const responseData: object = JSON.parse(response.getContentText());
   return responseData["events"];
